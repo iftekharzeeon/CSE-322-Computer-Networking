@@ -6,11 +6,11 @@ wiredTclFileName=wired_new
 wiredTraceFileName=trace_wired
 wirelessTraceFileName=trace_wireless
 
-wiredParseFileRed=parse_wired_RED
-wiredParseFileNaRed=parse_wired_NARED
+wiredParseFileRed=Parsers/parse_wired_RED
+wiredParseFileNaRed=Parsers/parse_wired_NARED
 
-wirelessParseFileRed=parse_wireless_RED
-wirelessParseFileNaRed=parse_wireless_NARED
+wirelessParseFileRed=Parsers/parse_wireless_RED
+wirelessParseFileNaRed=Parsers/parse_wireless_NARED
 
 baseNode=40
 baseFlow=20
