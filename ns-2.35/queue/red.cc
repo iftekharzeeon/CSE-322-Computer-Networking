@@ -151,6 +151,8 @@ REDQueue::REDQueue(const char * trace) : link_(NULL), de_drop_(NULL), EDTrace(NU
 	bind("curq_", &curq_);			    // current queue size
 	bind("cur_max_p_", &edv_.cur_max_p);        // current max_p
 
+
+	//Changed
 	bind("modified_red_", &edp_.is_modifiedRed); //Is NARED working or not
 	bind("buffer_size", &edp_.buffer_size); // Buffer size for NARED
 	
@@ -251,6 +253,10 @@ void REDQueue::initParams()
 	edp_.feng_adaptive = 0;
 	edp_.ptc = 0.0;
 	edp_.delay = 0.0;
+
+	//Changed
+	edp_.is_modifiedRed = 0;
+	edp_.buffer_size = 0;
 	
 	edv_.v_ave = 0.0;
 	edv_.v_prob1 = 0.0;
@@ -388,13 +394,17 @@ void REDQueue::updateMaxP(double new_ave, double now)
  */
 double REDQueue::estimator(int nqueued, int m, double ave, double q_w)
 {
+	//Changed
+
 	double new_ave;
 
 	new_ave = ave;
 
+	//printf("Estimating average queue length, Modified RED is %d\n", edp_.is_modifiedRed);
+
 	if (edp_.is_modifiedRed) {
 		// Modified RED is working
-		new_ave = (1.0 - q_w) * new_ave + q_w * nqueued;
+		new_ave = ((1.0 - q_w) * new_ave) + (q_w * nqueued);
 	} else {
 		//Default RED is working
 		while (--m >= 1) {
@@ -446,6 +456,7 @@ double
 REDQueue::calculate_p_new(double v_ave, double th_max, int gentle, double v_a, 
 	double v_b, double v_c, double v_d, double max_p)
 {
+	//printf("Default RED probability is being calculated\n");
 	double p;
 	if (gentle && v_ave >= th_max) {
 		// p ranges from max_p to 1 as the average queue
@@ -471,27 +482,43 @@ REDQueue::calculate_p_new(double v_ave, double th_max, int gentle, double v_a,
 /*
  * Calculate the drop probability for modified RED
  */
+//Changed
 double
-REDQueue::calculate_p_modifiedRed(double v_ave, double th_max, int gentle, double v_a, 
-	double v_b, double v_c, double v_d, double max_p)
+REDQueue::calculate_p_modifiedRed(double v_ave, double th_max, double th_min, double count, double max_p, double buffer_size)
 {
+	//printf("Modified RED probability is being calucalted\n");
 	double p;
-	if (gentle && v_ave >= th_max) {
-		// p ranges from max_p to 1 as the average queue
-		// size ranges from th_max to twice th_max 
-		p = v_c * v_ave + v_d;
-        } else if (!gentle && v_ave >= th_max) { 
-                // OLD: p continues to range linearly above max_p as
-                // the average queue size ranges above th_max.
-                // NEW: p is set to 1.0 
-                p = 1.0;
-        } else {
-                // p ranges from 0 to max_p as the average queue
-                // size ranges from th_min to th_max 
-                p = v_a * v_ave + v_b;
-                // p = (v_ave - th_min) / (th_max - th_min)
-                p *= max_p; 
-        }
+
+	if (v_ave < th_min) {
+		p = 0.0;
+	} else if (v_ave >= buffer_size) {
+		p = 1.0;
+	} else {
+		//Adjusting p_max
+		double k1 = th_min + 0.4 * (buffer_size - th_min);
+		double k2 = th_min + 0.6 * (buffer_size - th_min);
+		double b = 0.9;
+		double a = 0.01;
+		if (a > max_p/4) {
+			a = max_p/4;
+		}
+		if (v_ave < k1) {
+			max_p = max_p * b;
+		} else if (v_ave > k2) {
+			max_p = max_p + a;
+		}
+		edv_.cur_max_p = max_p;
+
+		printf("Debug Max Probability %f\n", max_p);
+
+		//Calculate the probability according to new function
+		double temp_p;
+		temp_p = (max_p * pow((v_ave - th_min),3)) / ((1 - max_p) * pow((buffer_size - th_min), 3) + max_p * pow((v_ave - max_p), 3));
+
+		p = temp_p / (1 - (count * temp_p));
+		
+	}
+
 	if (p > 1.0)
 		p = 1.0;
 	return p;
@@ -505,15 +532,18 @@ double
 REDQueue::calculate_p(double v_ave, double th_max, int gentle, double v_a, 
 	double v_b, double v_c, double v_d, double max_p_inv)
 {
+	//Changed
 	double p;
+	//printf("Calculating Probability, Modified RED is %d\n", edp_.is_modifiedRed);
 	if (edp_.is_modifiedRed) {
 		//Modified RED is running
-		p = calculate_p_modifiedRed(v_ave, th_max, gentle, v_a,
-			v_b, v_c, v_d, 1.0 / max_p_inv);
+		//printf("Debug %f\n", max_p_inv);
+		p = calculate_p_modifiedRed(v_ave, th_max, edp_.th_min, edv_.count, max_p_inv, edp_.buffer_size);
 	} else {
 		//Default RED is running
+		printf("Debug %f\n", max_p_inv);
 		p = calculate_p_new(v_ave, th_max, gentle, v_a,
-			v_b, v_c, v_d, 1.0 / max_p_inv);
+			v_b, v_c, v_d, max_p_inv);
 	}
 	return p;
 }
@@ -565,8 +595,10 @@ REDQueue::drop_early(Packet* pkt)
 
 	edv_.v_prob1 = calculate_p(edv_.v_ave, edp_.th_max, edp_.gentle, 
   	  edv_.v_a, edv_.v_b, edv_.v_c, edv_.v_d, edv_.cur_max_p);
+	printf("Debug probability value %f\n", (double) edv_.v_prob1);
 	edv_.v_prob = modify_p(edv_.v_prob1, edv_.count, edv_.count_bytes,
 	  edp_.bytes, edp_.mean_pktsize, edp_.wait, ch->size());
+	printf("Debug probability value after modify %f\n", edv_.v_prob);
 
 	// drop probability is computed, pick random number and act
 	if (edp_.cautious == 1) {

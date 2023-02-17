@@ -15,24 +15,30 @@ set val(mac)          Mac/802_11            ;# MAC type
 set val(rp)           DSDV                     ;# ad-hoc routing protocol 
 # =======================================================================
 
+# Number of nodes
+set val(nn) [lindex $argv 0]
+
+# Number of flows
+set val(nf) [lindex $argv 1]
+
+# Area size
+set val(as) [lindex $argv 2]
+
+# Packet Rate
+set val(pr) [lindex $argv 3]
+
 # =======================================================================
-Queue/RED set thresh_ 10
-Queue/RED set maxthresh_ 40
+Queue/RED set thresh_queue_ 10
+Queue/RED set maxthresh_queue_ 40
 Queue/RED set q_weight_ 0.003
 Queue/RED set bytes_ false
 Queue/RED set queue_in_bytes_ false
 Queue/RED set gentle_ false
-Queue/RED set mean_pktsize_ 1000
+Queue/RED set mean_pktsize_ 100
+Queue/RED set modified_red_ [lindex $argv 4]
+Queue/RED set buffer_size 80
+Queue/RED set cur_max_p_ 0.1
 # =======================================================================
-
-# Number of nodes
-set val(nn) 40
-
-# Number of flows
-set val(nf) 20
-
-# Area size
-set val(as) 500
 
 # trace file
 set trace_file [open trace_wireless.tr w]
@@ -91,6 +97,12 @@ $ns node-config -adhocRouting $val(rp) \
                 -routerTrace ON \
                 -macTrace OFF \
                 -movementTrace OFF \
+                # -energyModel "EnergyModel" \
+                # -initialEnergy  2.0 \
+                # -rxPower        0.8 \
+                # -txPower        0.5 \
+                # -idlePower 0.35 \
+                # -sleepPower 0.05 \
 
 set val(max) $val(as)
 set val(min) 1
@@ -127,8 +139,8 @@ for {set i 0} {$i < $val(nf)} {incr i} {
         set dest [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
     }
 
-    puts "$src >> $dest" 
-    puts "-----------------------"
+    # puts "$src >> $dest" 
+    # puts "-----------------------"
 
     # Traffic config
     # create agent
@@ -142,6 +154,9 @@ for {set i 0} {$i < $val(nf)} {incr i} {
     # connect agents
     $ns connect $tcp $tcp_sink
     $tcp set fid_ $i
+
+    $tcp set window_ 15
+    $tcp set packetRate_ $val(pr)
 
     # Traffic generator
     set ftp [new Application/FTP]
@@ -171,6 +186,7 @@ proc finish_simulation {} {
 proc halt_simulation {} {
     global ns
     puts "Simulation Ending"
+    puts "____________________________"
     $ns halt
 }
 
@@ -179,4 +195,5 @@ $ns at 50.0002 "halt_simulation"
 
 # Run simulation
 puts "Simulation starting"
+puts "^^^^^^^^^^^^^^^^^^^^^^^^^"
 $ns run

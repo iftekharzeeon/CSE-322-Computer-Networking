@@ -107,6 +107,7 @@ struct edp {
 				/* 0 for automatic setting */
 	int feng_adaptive;	/* adaptive RED: Use the Feng et al. version */
 
+	//Changed
 	int is_modifiedRed; /* 0 for default RED, 1 for modified RED (NARED) */
 	int buffer_size; /* New buffersize if modified red is on */
 			
@@ -166,6 +167,8 @@ class REDQueue : public Queue {
 	  double v_a, double v_b, double v_c, double v_d, double max_p);
  	double calculate_p(double v_ave, double th_max, int gentle, 
 	  double v_a, double v_b, double v_c, double v_d, double max_p_inv);
+	//Changed
+	double calculate_p_modifiedRed(double v_ave, double th_max, double th_min, double count, double max_p_inv, double buffer_size);
         virtual void reportDrop(Packet *pkt); //pushback
 	void print_summarystats();
 

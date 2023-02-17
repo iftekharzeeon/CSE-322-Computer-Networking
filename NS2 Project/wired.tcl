@@ -1,4 +1,18 @@
 #Create a simulator object
+
+# =======================================================================
+Queue/RED set thresh_queue_ 10
+Queue/RED set maxthresh_queue_ 40
+Queue/RED set q_weight_ 0.003
+Queue/RED set bytes_ false
+Queue/RED set queue_in_bytes_ false
+Queue/RED set gentle_ false
+Queue/RED set mean_pktsize_ 100
+Queue/RED set modified_red_ 1
+Queue/RED set buffer_size 80
+Queue/RED set cur_max_p_ 0.1
+# =======================================================================
+
 set ns [new Simulator]
 
 #
@@ -41,21 +55,21 @@ $ns duplex-link $node_s1 $node_r1 15Mb 10ms RED
 $ns duplex-link $node_s2 $node_r1 15Mb 10ms RED 
 $ns duplex-link $node_s3 $node_r1 15Mb 10ms RED 
 $ns duplex-link $node_r1 $node_r2 1Mb 30ms RED 
-$ns queue-limit $node_r1 $node_r2 20
-$ns queue-limit $node_r2 $node_r1 20
+$ns queue-limit $node_r1 $node_r2 100
+$ns queue-limit $node_r2 $node_r1 100
 $ns duplex-link $node_d1 $node_r2 15Mb 30ms RED 
 $ns duplex-link $node_d2 $node_r2 15Mb 30ms RED 
 $ns duplex-link $node_d3 $node_r2 15Mb 30ms RED 
 
 #Give node position (for NAM)
 $ns duplex-link-op $node_s1 $node_r1 orient right-down
-$ns duplex-link-op $node_s2 $node_r1 orient right
-$ns duplex-link-op $node_s3 $node_r1 orient right-up
+$ns duplex-link-op $node_s2 $node_r1 orient right-down
+$ns duplex-link-op $node_s3 $node_r1 orient right-down
 $ns duplex-link-op $node_r1 $node_r2 orient right
 $ns duplex-link-op $node_r1 $node_r2 queuePos 0
 $ns duplex-link-op $node_r2 $node_r1 queuePos 0
-$ns duplex-link-op $node_d1 $node_r2 orient left-down
-$ns duplex-link-op $node_d2 $node_r2 orient left
+$ns duplex-link-op $node_d1 $node_r2 orient left-up
+$ns duplex-link-op $node_d2 $node_r2 orient left-up
 $ns duplex-link-op $node_d3 $node_r2 orient left-up
 
 
