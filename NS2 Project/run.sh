@@ -308,3 +308,9 @@ python3 summary.py p $imagelocation ws
 
 rm params_RED.txt
 rm params_NARED.txt
+
+rm $wiredTraceFileName.tr 
+rm $wirelessTraceFileName.tr
+
+rm animation_wired.nam 
+rm animation_wireless.nam

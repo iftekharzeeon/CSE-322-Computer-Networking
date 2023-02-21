@@ -9,9 +9,9 @@ image_location = sys.argv[2]
 network_type = sys.argv[3]
 
 if (network_type == "wd"):
-    network_type == " (Wired) "
+    network_type = " (Wired) "
 elif (network_type == "ws"):
-    network_type == " (Wireless) "
+    network_type = " (Wireless) "
 
 if (graph_type == "n"):
     graph_type = "Number of Nodes"
@@ -71,6 +71,7 @@ for line in Lines:
 # Graph 1
 plt.plot(x_axis_values, y_axis_throughput_red, marker=".", color="red", label="RED")
 plt.plot(x_axis_values, y_axis_throughput_nared, marker=".", color="blue", label="NARED")  
+plt.legend()
 
 plt.xlabel(graph_type) 
 plt.ylabel("Throughput (bits/sec)") 
@@ -84,6 +85,7 @@ plt.close()
 # Graph 2
 plt.plot(x_axis_values, y_axis_avgdelay_red, marker=".", color="red", label="RED")
 plt.plot(x_axis_values, y_axis_avgdelay_nared, marker=".", color="blue", label="NARED") 
+plt.legend()
 
 plt.xlabel(graph_type) 
 plt.ylabel("Average Delay") 
@@ -97,6 +99,7 @@ plt.close()
 # Graph 3
 plt.plot(x_axis_values, y_axis_deliveryratio_red, marker=".", color="red", label="RED") 
 plt.plot(x_axis_values, y_axis_deliveryratio_nared, marker=".", color="blue", label="NARED") 
+plt.legend()
 
 plt.xlabel(graph_type) 
 plt.ylabel("Packet Delivery Ratio") 
@@ -110,6 +113,7 @@ plt.close()
 # Graph 4
 plt.plot(x_axis_values, y_axis_dropratio_red, marker=".", color="red", label="RED")
 plt.plot(x_axis_values, y_axis_dropratio_nared, marker=".", color="blue", label="NARED") 
+plt.legend()
 
 plt.xlabel(graph_type) 
 plt.ylabel("Packet Drop Ratio") 

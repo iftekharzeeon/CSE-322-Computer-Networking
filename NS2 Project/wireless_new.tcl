@@ -27,6 +27,10 @@ set val(as) [lindex $argv 2]
 # Packet Rate
 set val(pr) [lindex $argv 3]
 
+set ftp_interval [expr 1.0/$val(pr)]
+
+set val(seed) 23
+
 # =======================================================================
 Queue/RED set thresh_queue_ 10
 Queue/RED set maxthresh_queue_ 40
@@ -34,7 +38,7 @@ Queue/RED set q_weight_ 0.003
 Queue/RED set bytes_ false
 Queue/RED set queue_in_bytes_ false
 Queue/RED set gentle_ false
-Queue/RED set mean_pktsize_ 100
+Queue/RED set mean_pktsize_ 1000
 Queue/RED set modified_red_ [lindex $argv 4]
 Queue/RED set buffer_size 80
 Queue/RED set cur_max_p_ 0.1
@@ -97,15 +101,17 @@ $ns node-config -adhocRouting $val(rp) \
                 -routerTrace ON \
                 -macTrace OFF \
                 -movementTrace OFF \
-                # -energyModel "EnergyModel" \
-                # -initialEnergy  2.0 \
-                # -rxPower        0.8 \
-                # -txPower        0.5 \
-                # -idlePower 0.35 \
-                # -sleepPower 0.05 \
+                -energyModel "EnergyModel" \
+                -initialEnergy  90.0 \
+                -rxPower        20 \
+                -txPower        10 \
+                -idlePower 10 \
+                -sleepPower 5 \
 
 set val(max) $val(as)
 set val(min) 1
+
+expr srand($val(seed))
 
 # create nodes
 for {set i 0} {$i < $val(nn)} {incr i} {
@@ -116,9 +122,6 @@ for {set i 0} {$i < $val(nn)} {incr i} {
     $node($i) set X_ [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
     $node($i) set Y_ [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
     $node($i) set Z_ 0
-    # $node($i) set X_ [expr int(10000 * rand()) % $val(as) + 0.5]
-    # $node($i) set Y_ [expr int(10000 * rand()) % $val(as) + 0.5]
-    # $node($i) set Z_ 0
 
     $ns initial_node_pos $node($i) 20
     
@@ -131,10 +134,13 @@ set val(min) 0
 # Initialize one random source
 set src [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
 
+puts $src
+
 for {set i 0} {$i < $val(nf)} {incr i} {
 
     # picking random destination/sink node
     set dest [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
+    puts $dest
     while {$src == $dest} {
         set dest [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
     }
@@ -144,23 +150,31 @@ for {set i 0} {$i < $val(nf)} {incr i} {
 
     # Traffic config
     # create agent
-    set tcp [new Agent/TCP/Reno]
+    set tcp [new Agent/TCP]
     set tcp_sink [new Agent/TCPSink]
+
+    # /home/zeeon/ns-allinone-2.35/nam-1.15/nam animation_wired.nam
 
     # attach to nodes
     $ns attach-agent $node($src) $tcp
     $ns attach-agent $node($dest) $tcp_sink
+
+    $tcp set packetSize_ 1000
+    $tcp set window_ [expr 10 *($val(pr) / 100)]
     
     # connect agents
     $ns connect $tcp $tcp_sink
     $tcp set fid_ $i
 
-    $tcp set window_ 15
-    $tcp set packetRate_ $val(pr)
+    # $tcp set window_ 15
+    # $tcp set packetRate_ $val(pr)
 
     # Traffic generator
     set ftp [new Application/FTP]
     # attach to agent
+
+    # puts "Interval $ftp_interval"
+
     $ftp attach-agent $tcp
 
     # starting traffic/flow generation
