@@ -102,11 +102,11 @@ $ns node-config -adhocRouting $val(rp) \
                 -macTrace OFF \
                 -movementTrace OFF \
                 -energyModel "EnergyModel" \
-                -initialEnergy  90.0 \
-                -rxPower        20 \
-                -txPower        10 \
-                -idlePower 10 \
-                -sleepPower 5 \
+                -initialEnergy  2000.0 \
+                -rxPower        1.0 \
+                -txPower        1.0 \
+                -idlePower 1.0 \
+                -sleepPower 0.001 \
 
 set val(max) $val(as)
 set val(min) 1
@@ -140,7 +140,7 @@ for {set i 0} {$i < $val(nf)} {incr i} {
 
     # picking random destination/sink node
     set dest [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
-    puts $dest
+    # puts $dest
     while {$src == $dest} {
         set dest [expr int(rand() * ($val(max)-$val(min))) + $val(min)]
     }
@@ -186,7 +186,7 @@ for {set i 0} {$i < $val(nf)} {incr i} {
 # End Simulation
 # stopping nodes
 for {set i 0} {$i < $val(nn)} {incr i} {
-    $ns at 50.0 "$node($i) reset"
+    $ns at 150.0 "$node($i) reset"
 }
 
 # defining terminating procedures
@@ -204,8 +204,8 @@ proc halt_simulation {} {
     $ns halt
 }
 
-$ns at 50.0001 "finish_simulation"
-$ns at 50.0002 "halt_simulation"
+$ns at 150.0001 "finish_simulation"
+$ns at 150.0002 "halt_simulation"
 
 # Run simulation
 puts "Simulation starting"

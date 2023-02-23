@@ -29,11 +29,13 @@ y_axis_throughput_red = []
 y_axis_avgdelay_red = []
 y_axis_deliveryratio_red = []
 y_axis_dropratio_red = []
+y_axis_energy_consumption_red = []
 
 y_axis_throughput_nared = []
 y_axis_avgdelay_nared = []
 y_axis_deliveryratio_nared = []
 y_axis_dropratio_nared = []
+y_axis_energy_consumption_nared = []
 
 file1 = open('params_RED.txt', 'r')
 file2 = open('params_NARED.txt', 'r')
@@ -50,6 +52,8 @@ for line in Lines:
         y_axis_avgdelay_red.append(float (separated_line[1]))
         y_axis_deliveryratio_red.append(float (separated_line[2]))
         y_axis_dropratio_red.append(float (separated_line[3]))
+        if (network_type == " (Wireless) "):
+            y_axis_energy_consumption_red.append(float (separated_line[4]))
     else:
         x_axis_values.append(int (separated_line[0]))
 
@@ -65,6 +69,8 @@ for line in Lines:
         y_axis_avgdelay_nared.append(float (separated_line[1]))
         y_axis_deliveryratio_nared.append(float (separated_line[2]))
         y_axis_dropratio_nared.append(float (separated_line[3]))
+        if (network_type == " (Wireless) "):
+            y_axis_energy_consumption_nared.append(float (separated_line[4]))
 
 
 
@@ -122,3 +128,17 @@ plt.title(graph_type + " vs Packet Drop Ratio")
 plt.savefig(image_location + "/" + graph_type + " vs Packet Drop Ratio"+".jpg", )
 
 plt.close()
+
+if (network_type == " (Wireless) "):
+    # Graph 5
+    plt.plot(x_axis_values, y_axis_energy_consumption_red, marker=".", color="red", label="RED")
+    plt.plot(x_axis_values, y_axis_energy_consumption_nared, marker=".", color="blue", label="NARED")
+    plt.legend()
+
+    plt.xlabel(graph_type)
+    plt.ylabel("Energy Consumption (Joules)")
+
+    plt.title(graph_type + " vs Energy Consumption")
+    plt.savefig(image_location + "/" + graph_type + " vs Energy Consumption"+".jpg", )
+
+    plt.close()

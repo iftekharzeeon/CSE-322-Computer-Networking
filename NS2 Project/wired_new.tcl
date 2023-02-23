@@ -12,8 +12,10 @@ set val(nf) [lindex $argv 1]
 set val(pr) [lindex $argv 2] 
 
 set val(qlimit) 100
-set val(start_time) 0.5
-set val(end_time) 10
+set val(start_time) 1.0
+set val(end_time) 150
+
+set val(seed) 23
 
 # =======================================================================
 Queue/RED set thresh_queue_ 10
@@ -83,6 +85,8 @@ for {set i 0} {$i < [expr {$val(nn) / 2}]} {incr i} {
 set val(max) [expr {$val(nn) / 2}]
 set val(min) 0
 
+expr srand($val(seed))
+
 #Setup flows
 
 for {set i 0} {$i < $val(nf)} {incr i} {
@@ -97,6 +101,9 @@ for {set i 0} {$i < $val(nf)} {incr i} {
     $ns attach-agent $node_(d$dest) $sink
     $ns connect $tcp $sink
     $tcp set fid_ $i
+
+    $tcp set packetSize_ 1000
+    $tcp set window_ [expr 10 *($val(pr) / 100)]
 
     set ftp [new Application/FTP]
     $ftp attach-agent $tcp

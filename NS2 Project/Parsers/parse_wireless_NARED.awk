@@ -1,5 +1,5 @@
 BEGIN {
-    initial_energy=90.0
+    initial_energy=2000.0
     received_packets = 0;
     sent_packets = 0;
     dropped_packets = 0;
@@ -8,9 +8,12 @@ BEGIN {
 
     energy = 0;
     totalenergy = 0;
+    averageEnergy = 0;
     
     start_time = 1000000;
     end_time = 0;
+
+    number_of_nodes = 0;
 
     # constants
     header_bytes = 20;
@@ -79,9 +82,12 @@ BEGIN {
 END {
 
     for (i in final_energy) {
-        consumenergy = initial_energy - final_energy[i]
-        totalenergy += consumenergy
+        consumenergy = initial_energy - final_energy[i];
+        totalenergy += consumenergy;
+        number_of_nodes += 1;
     }
+
+    averageEnergy = totalenergy / number_of_nodes;
     
     end_time = time_sec;
     print "End time: ", end_time
@@ -100,5 +106,5 @@ END {
     # print "Delivery ratio: ", (received_packets / sent_packets);
     print "Drop ratio: ", (dropped_packets / sent_packets);
 
-    print (received_bytes * 8) / simulation_time, " ", (total_delay / received_packets), " ", (received_packets / sent_packets), " ", (dropped_packets / sent_packets), totalenergy >> "params_NARED.txt"
+    print (received_bytes * 8) / simulation_time, " ", (total_delay / received_packets), " ", (received_packets / sent_packets), " ", (dropped_packets / sent_packets), averageEnergy >> "params_NARED.txt"
 }
