@@ -29,7 +29,7 @@ set val(pr) [lindex $argv 3]
 
 set ftp_interval [expr 1.0/$val(pr)]
 
-set val(seed) 23
+# set val(seed) 23
 
 # =======================================================================
 Queue/RED set thresh_queue_ 10
@@ -102,7 +102,7 @@ $ns node-config -adhocRouting $val(rp) \
                 -macTrace OFF \
                 -movementTrace OFF \
                 -energyModel "EnergyModel" \
-                -initialEnergy  2000.0 \
+                -initialEnergy  1000.0 \
                 -rxPower        1.0 \
                 -txPower        1.0 \
                 -idlePower 1.0 \
@@ -111,7 +111,7 @@ $ns node-config -adhocRouting $val(rp) \
 set val(max) $val(as)
 set val(min) 1
 
-expr srand($val(seed))
+# expr srand($val(seed))
 
 # create nodes
 for {set i 0} {$i < $val(nn)} {incr i} {

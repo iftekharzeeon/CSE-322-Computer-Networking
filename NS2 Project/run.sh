@@ -15,7 +15,7 @@ wirelessParseFileNaRed=Parsers/parse_wireless_NARED
 baseNode=40
 baseFlow=20
 basePacketRate=200
-baseArea=500
+baseArea=250
 redFlag=0
 naredFlag=1
 
@@ -236,10 +236,10 @@ rm params_RED.txt
 touch params_RED.txt
 touch params_NARED.txt
 
-# Varying areas
+# Varying Coverage Area
 
 echo '------------------------------------'
-echo 'Varying areas for RED'
+echo 'Varying Coverage Area for RED'
 echo '------------------------------------'
 
 for((i=0; i<5; i++)); do
@@ -253,7 +253,7 @@ for((i=0; i<5; i++)); do
 done
 
 echo '------------------------------------'
-echo 'Varying areas for NARED'
+echo 'Varying Coverage Area for NARED'
 echo '------------------------------------'
 
 for((i=0; i<5; i++)); do

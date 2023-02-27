@@ -15,7 +15,7 @@ set val(qlimit) 100
 set val(start_time) 1.0
 set val(end_time) 150
 
-set val(seed) 23
+# set val(seed) 23
 
 # =======================================================================
 Queue/RED set thresh_queue_ 10
@@ -85,7 +85,7 @@ for {set i 0} {$i < [expr {$val(nn) / 2}]} {incr i} {
 set val(max) [expr {$val(nn) / 2}]
 set val(min) 0
 
-expr srand($val(seed))
+# expr srand($val(seed))
 
 #Setup flows
 
