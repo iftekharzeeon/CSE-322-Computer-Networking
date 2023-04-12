@@ -1,4 +1,4 @@
-# NS2 Project Guideleins
+# NS2 Project Guidelines
 
 **<span style="text-decoration:underline;">Tasks to be Performed in .tcl File</span>**
 
