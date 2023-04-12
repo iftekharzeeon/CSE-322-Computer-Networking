@@ -1,6 +1,7 @@
-**Submission Deadline: January 30, 2023, Monday, 11:59 PM**
 
-**Personalised Parameters: **
+# NS2 Offline Specs
+
+**Personalised Parameters:**
 
 See [this Google Sheet](https://docs.google.com/spreadsheets/d/1W7ttHCuQ8RWvopPqVLOiZcBU8eGqEW7H3JVR6px6ogY/) to know your parameters. 
 
@@ -86,7 +87,7 @@ For each of the varying parameters, plot 4 graph showing,
 
 
 
-**For example: **
+**For example:**
 
 Say, for varying area sizes, keep other params fixed as mentioned in baseline. Find 4 metrics for each of the values of area size. Plot each metric in a separate graph. You will get 4 graphs for varying area size. One of them is the Delivery ratio. It may look like this. **Clearly mention the x-axis, y-axis, x-ticks and y-ticks.**
 
